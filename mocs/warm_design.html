@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>KR-Move Planner – Sunny Seoul Layout</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      :root {
+        --bg: #fefce8;
+        --bg-soft: #fffbeb;
+        --bg-surface: #ffffff;
+
+        --accent: #eab308; /* Jaune principal */
+        --accent-soft: rgba(234, 179, 8, 0.15);
+        --accent-strong: #ca8a04;
+
+        --accent-alt: #2563eb; /* Bleu secondaire */
+        --accent-alt-soft: rgba(37, 99, 235, 0.12);
+
+        --text-main: #0f172a;
+        --text-muted: #6b7280;
+        --text-soft: #9ca3af;
+
+        --border-subtle: #e5e7eb;
+
+        --radius-lg: 18px;
+        --radius-pill: 999px;
+
+        --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.08);
+        --font-main: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: var(--font-main);
+        background: radial-gradient(circle at top, #fef3c7 0, #fefce8 40%, #f9fafb 100%);
+        color: var(--text-main);
+      }
+
+      .app {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* HEADER */
+
+      .app-header {
+        background: rgba(255, 251, 235, 0.95);
+        backdrop-filter: blur(18px);
+        border-bottom: 1px solid rgba(248, 250, 252, 0.9);
+        position: sticky;
+        top: 0;
+        z-index: 20;
+      }
+
+      .header-inner {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .brand-logo {
+        width: 34px;
+        height: 34px;
+        border-radius: 14px;
+        background: radial-gradient(circle at 30% 0, #facc15, #f97316 50%, #fbbf24 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: #78350f;
+        box-shadow: 0 0 0 2px #fefce8, 0 10px 25px rgba(202, 138, 4, 0.38);
+      }
+
+      .brand-text h1 {
+        margin: 0;
+        font-size: 1.1rem;
+        letter-spacing: 0.02em;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .brand-text h1 span.flag {
+        font-size: 1.1rem;
+      }
+
+      .brand-text p {
+        margin: 0;
+        font-size: 0.8rem;
+        color: var(--text-muted);
+      }
+
+      .header-right {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .header-badge {
+        font-size: 0.72rem;
+        padding: 4px 10px;
+        border-radius: var(--radius-pill);
+        background: #fef3c7;
+        color: #854d0e;
+        border: 1px solid #fed7aa;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+      }
+
+      .user-chip {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 4px 8px;
+        border-radius: var(--radius-pill);
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid var(--border-subtle);
+      }
+
+      .user-info {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        text-align: right;
+      }
+
+      .user-info strong {
+        font-size: 0.85rem;
+      }
+
+      .user-info span {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+      }
+
+      .user-avatar {
+        width: 30px;
+        height: 30px;
+        border-radius: 999px;
+        background: linear-gradient(135deg, #facc15, #f97316);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #78350f;
+      }
+
+      /* MAIN */
+
+      .app-main {
+        flex: 1;
+        padding: 18px 12px 26px;
+      }
+
+      .main-inner {
+        max-width: 1180px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+
+      /* TOP STRIP */
+
+      .top-strip {
+        display: grid;
+        grid-template-columns: minmax(0, 1.8fr) minmax(260px, 1.2fr);
+        gap: 14px;
+        align-items: stretch;
+      }
+
+      @media (max-width: 960px) {
+        .top-strip {
+          grid-template-columns: minmax(0, 1fr);
+        }
+      }
+
+      .progress-card {
+        background: rgba(255, 255, 255, 0.98);
+        border-radius: 20px;
+        padding: 14px 16px 16px;
+        border: 1px solid var(--border-subtle);
+        box-shadow: var(--shadow-soft);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .progress-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        font-size: 0.85rem;
+      }
+
+      .progress-label {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      .progress-label span.title {
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .progress-label span.subtitle {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+      }
+
+      .progress-badge {
+        font-size: 0.75rem;
+        padding: 4px 9px;
+        border-radius: var(--radius-pill);
+        background: var(--accent-soft);
+        color: var(--accent-strong);
+        border: 1px solid rgba(234, 179, 8, 0.6);
+        white-space: nowrap;
+      }
+
+      .progress-bar {
+        width: 100%;
+        height: 10px;
+        border-radius: 999px;
+        background: #f3f4f6;
+        overflow: hidden;
+        border: 1px solid #e5e7eb;
+      }
+
+      .progress-fill {
+        height: 100%;
+        width: 42%;
+        border-radius: 999px;
+        background: linear-gradient(90deg, #fbbf24, #f97316);
+        box-shadow: 0 0 14px rgba(248, 181, 29, 0.7);
+      }
+
+      .progress-bottom {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        margin-top: 4px;
+      }
+
+      .phase-pills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        font-size: 0.72rem;
+        margin-top: 4px;
+      }
+
+      .phase-pill {
+        padding: 3px 8px;
+        border-radius: var(--radius-pill);
+        border: 1px solid #fee2e2;
+        background: #fef2f2;
+        color: #b91c1c;
+      }
+
+      .phase-pill.current {
+        border-color: #fed7aa;
+        background: #fffbeb;
+        color: #c05621;
+      }
+
+      .overview-card {
+        background: rgba(255, 255, 255, 0.98);
+        border-radius: 20px;
+        padding: 14px 16px 16px;
+        border: 1px solid var(--border-subtle);
+        box-shadow: var(--shadow-soft);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        font-size: 0.8rem;
+      }
+
+      .overview-title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        font-size: 0.85rem;
+        font-weight: 600;
+      }
+
+      .overview-pill {
+        font-size: 0.73rem;
+        padding: 3px 8px;
+        border-radius: var(--radius-pill);
+        background: var(--accent-alt-soft);
+        color: var(--accent-alt);
+        border: 1px solid rgba(37, 99, 235, 0.4);
+      }
+
+      .overview-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 6px 10px;
+        margin-top: 4px;
+      }
+
+      .overview-label {
+        font-size: 0.72rem;
+        color: var(--text-soft);
+      }
+
+      .overview-value {
+        font-size: 0.82rem;
+        font-weight: 500;
+      }
+
+      .overview-note {
+        margin-top: 4px;
+        font-size: 0.76rem;
+        color: var(--text-muted);
+      }
+
+      /* MAIN LAYOUT */
+
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1.5fr) minmax(260px, 1.1fr);
+        gap: 16px;
+        align-items: flex-start;
+      }
+
+      @media (max-width: 960px) {
+        .layout {
+          grid-template-columns: minmax(0, 1fr);
+        }
+      }
+
+      .column {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .panel {
+        background: rgba(255, 255, 255, 0.98);
+        border-radius: var(--radius-lg);
+        padding: 14px 16px 16px;
+        border: 1px solid var(--border-subtle);
+        box-shadow: var(--shadow-soft);
+      }
+
+      .panel-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+
+      .panel-title {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      .panel-title-main {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.95rem;
+        font-weight: 600;
+      }
+
+      .panel-title-main span.icon {
+        font-size: 1rem;
+      }
+
+      .panel-subtitle {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+      }
+
+      .badge-soft {
+        font-size: 0.72rem;
+        padding: 4px 9px;
+        border-radius: var(--radius-pill);
+        background: var(--accent-soft);
+        color: var(--accent-strong);
+        border: 1px solid rgba(234, 179, 8, 0.6);
+        white-space: nowrap;
+      }
+
+      /* STRATEGY CONTENT */
+
+      .strategy-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        font-size: 0.85rem;
+      }
+
+      .strategy-block {
+        border-radius: 14px;
+        padding: 10px 10px;
+        background: #fffbeb;
+        border: 1px solid #fef3c7;
+      }
+
+      .strategy-block h3 {
+        margin: 0 0 4px;
+        font-size: 0.9rem;
+        color: #713f12;
+      }
+
+      .strategy-block p {
+        margin: 0;
+        color: var(--text-muted);
+        line-height: 1.5;
+      }
+
+      .strategy-block ul {
+        margin: 6px 0 0;
+        padding-left: 18px;
+        color: var(--text-muted);
+      }
+
+      .strategy-tags {
+        margin-top: 6px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .tag {
+        font-size: 0.7rem;
+        padding: 3px 7px;
+        border-radius: var(--radius-pill);
+        background: #fef3c7;
+        color: #92400e;
+        border: 1px solid #fed7aa;
+        white-space: nowrap;
+      }
+
+      /* CHECKLIST */
+
+      .tasks-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        font-size: 0.8rem;
+      }
+
+      .task-item {
+        border-radius: 12px;
+        padding: 8px 9px;
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .task-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+
+      .task-title {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .task-title input {
+        margin: 0;
+        accent-color: var(--accent);
+      }
+
+      .task-title span.text {
+        font-weight: 500;
+      }
+
+      .task-pill {
+        font-size: 0.7rem;
+        padding: 3px 7px;
+        border-radius: var(--radius-pill);
+        background: var(--accent-alt-soft);
+        color: var(--accent-alt);
+        border: 1px solid rgba(37, 99, 235, 0.4);
+        white-space: nowrap;
+      }
+
+      .task-meta {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.7rem;
+        color: var(--text-soft);
+      }
+
+      .task-meta span.dot {
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        border-radius: 999px;
+        background: #22c55e;
+        margin-right: 4px;
+      }
+
+      /* JOB APPLICATIONS */
+
+      .table-wrapper {
+        margin-top: 4px;
+        border-radius: 14px;
+        border: 1px solid #e5e7eb;
+        overflow: hidden;
+        background: #f9fafb;
+        font-size: 0.78rem;
+      }
+
+      .table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .table th,
+      .table td {
+        padding: 7px 9px;
+        text-align: left;
+        border-bottom: 1px solid #e5e7eb;
+      }
+
+      .table th {
+        font-weight: 500;
+        color: var(--text-soft);
+        font-size: 0.72rem;
+        background: #f3f4f6;
+      }
+
+      .status-pill {
+        font-size: 0.7rem;
+        padding: 2px 7px;
+        border-radius: var(--radius-pill);
+        border: 1px solid #e5e7eb;
+        color: var(--text-soft);
+        background: #ffffff;
+      }
+
+      .status-pill--interview {
+        border-color: rgba(37, 99, 235, 0.5);
+        color: #1d4ed8;
+        background: #eff6ff;
+      }
+
+      .status-pill--offer {
+        border-color: rgba(34, 197, 94, 0.7);
+        color: #15803d;
+        background: #dcfce7;
+      }
+
+      .status-pill--pending {
+        border-color: rgba(234, 179, 8, 0.7);
+        color: #92400e;
+        background: #fef9c3;
+      }
+
+      .tag-small {
+        font-size: 0.7rem;
+        padding: 2px 6px;
+        border-radius: 999px;
+        background: #eef2ff;
+        color: #4f46e5;
+        border: 1px solid #c7d2fe;
+        white-space: nowrap;
+      }
+
+      /* EXPAT CARD */
+
+      .expat-card {
+        border-radius: 16px;
+        padding: 10px 11px 11px;
+        background: radial-gradient(circle at top left, #fef3c7, #fffbeb);
+        border: 1px solid #facc15;
+        font-size: 0.8rem;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .expat-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+
+      .expat-header span.title {
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .expat-header span.badge {
+        font-size: 0.7rem;
+        padding: 3px 8px;
+        border-radius: 999px;
+        background: #fef3c7;
+        color: #92400e;
+        border: 1px solid #fed7aa;
+      }
+
+      .expat-body {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 6px 10px;
+        margin-top: 4px;
+      }
+
+      .expat-label {
+        font-size: 0.7rem;
+        color: var(--text-soft);
+      }
+
+      .expat-value {
+        font-size: 0.82rem;
+        font-weight: 500;
+        color: #78350f;
+      }
+
+      .expat-footer {
+        margin-top: 4px;
+        font-size: 0.75rem;
+        color: #92400e;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .expat-footer span.emoji {
+        font-size: 1rem;
+      }
+
+      /* FOOTER */
+
+      .app-footer {
+        padding: 8px 16px 18px;
+        font-size: 0.72rem;
+        color: var(--text-soft);
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <header class="app-header">
+        <div class="header-inner">
+          <div class="brand">
+            <div class="brand-logo">KR</div>
+            <div class="brand-text">
+              <h1><span class="flag">🇰🇷</span> KR-Move Planner</h1>
+              <p>Warm dashboard for your E-7 move to South Korea</p>
+            </div>
+          </div>
+          <div class="header-right">
+            <span class="header-badge"> ● Personal workspace · Q1 2027 target </span>
+            <div class="user-chip">
+              <div class="user-info">
+                <strong>Laurent</strong>
+                <span>E-7 Track · Fullstack Dev</span>
+              </div>
+              <div class="user-avatar">LG</div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main class="app-main">
+        <div class="main-inner">
+          <!-- Bandeau haut -->
+          <section class="top-strip">
+            <article class="progress-card">
+              <div class="progress-top">
+                <div class="progress-label">
+                  <span class="title"> ☀️ Relocation progress </span>
+                  <span class="subtitle"> Phase 2 — Job & documents · France → Korea </span>
+                </div>
+                <span class="progress-badge"> 42% complete </span>
+              </div>
+
+              <div class="progress-bar">
+                <div class="progress-fill"></div>
+              </div>
+
+              <div class="progress-bottom">
+                <span>Completed: 10 / 24 tasks</span>
+                <span>Estimated move: Q1 2027</span>
+              </div>
+
+              <div class="phase-pills">
+                <span class="phase-pill">Phase 1 · Profile & foundation</span>
+                <span class="phase-pill current">Phase 2 · Job & documents</span>
+                <span class="phase-pill">Phase 3 · Visa & relocation</span>
+              </div>
+            </article>
+
+            <article class="overview-card">
+              <div class="overview-title">
+                <span>Snapshot · KR-Move profile</span>
+                <span class="overview-pill">AI summary</span>
+              </div>
+              <div class="overview-grid">
+                <div>
+                  <div class="overview-label">Pseudo</div>
+                  <div class="overview-value">Laurent</div>
+                </div>
+                <div>
+                  <div class="overview-label">Target city</div>
+                  <div class="overview-value">Seoul</div>
+                </div>
+                <div>
+                  <div class="overview-label">Target position</div>
+                  <div class="overview-value">Fullstack Developer</div>
+                </div>
+                <div>
+                  <div class="overview-label">Status</div>
+                  <div class="overview-value">Phase 2 · Active</div>
+                </div>
+              </div>
+              <div class="overview-note">
+                This snapshot will evolve as you update your tasks, job applications and Korean level.
+              </div>
+            </article>
+          </section>
+
+          <!-- Layout principal -->
+          <section class="layout">
+            <!-- Colonne gauche : Stratégie + Jobs -->
+            <div class="column">
+              <!-- Stratégie -->
+              <article class="panel">
+                <div class="panel-header">
+                  <div class="panel-title">
+                    <div class="panel-title-main">
+                      <span class="icon">🧠</span>
+                      <span>Relocation strategy</span>
+                    </div>
+                    <div class="panel-subtitle">Generated from your profile (age, degree, experience, salary).</div>
+                  </div>
+                  <span class="badge-soft">AI strategy · v1.0</span>
+                </div>
+
+                <div class="strategy-grid">
+                  <div class="strategy-block">
+                    <h3>1. Profile & eligibility</h3>
+                    <p>
+                      With 5+ years of experience as a Fullstack Developer and a relevant degree, you are a strong
+                      candidate for an E-7 visa in the IT category. Target companies used to foreign hires where English
+                      is accepted and Korean is a plus.
+                    </p>
+                    <div class="strategy-tags">
+                      <span class="tag">E-7 IT category</span>
+                      <span class="tag">5+ years experience</span>
+                      <span class="tag">Bachelor level</span>
+                    </div>
+                  </div>
+
+                  <div class="strategy-block">
+                    <h3>2. Documents (France → Korea)</h3>
+                    <p>
+                      Start early with every document that may need translation or apostille. Make sure the job title
+                      and responsibilities stay consistent across documents and future contract.
+                    </p>
+                    <ul>
+                      <li>Diploma + transcripts · translated</li>
+                      <li>Work certificates (last 3–5 years)</li>
+                      <li>Criminal record, recent (&lt; 3 months)</li>
+                      <li>Updated passport + biometric photos</li>
+                    </ul>
+                  </div>
+
+                  <div class="strategy-block">
+                    <h3>3. Job search & positioning</h3>
+                    <p>
+                      Target mid-level roles where your fullstack skills bring clear value: backend, fullstack, or
+                      platform roles. Highlight React, Node, Symfony and your long-term plan to live in Korea.
+                    </p>
+                    <p>
+                      Use LinkedIn, JobKorea, Saramin and networking. For each application, keep a simple status and one
+                      clear next action.
+                    </p>
+                  </div>
+
+                  <div class="strategy-block">
+                    <h3>4. Korean & integration plan</h3>
+                    <p>
+                      Keep Korean learning in parallel. Aim for TOPIK II first, then progressively move toward TOPIK 4
+                      to unlock more roles and make daily life easier once in Seoul.
+                    </p>
+                  </div>
+                </div>
+              </article>
+
+              <!-- Job applications -->
+              <article class="panel">
+                <div class="panel-header">
+                  <div class="panel-title">
+                    <div class="panel-title-main">
+                      <span class="icon">💼</span>
+                      <span>Job applications</span>
+                    </div>
+                    <div class="panel-subtitle">E-7 relevant roles you’re currently tracking.</div>
+                  </div>
+                  <span class="badge-soft">3 active · 1 offer</span>
+                </div>
+
+                <div class="table-wrapper">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th>Company</th>
+                        <th>Role</th>
+                        <th>City</th>
+                        <th>Status</th>
+                        <th>Applied</th>
+                        <th>Notes</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>SeoulTech Labs</td>
+                        <td>Fullstack Developer</td>
+                        <td>Seoul</td>
+                        <td>
+                          <span class="status-pill status-pill--interview"> Interview </span>
+                        </td>
+                        <td>2025-11-05</td>
+                        <td><span class="tag-small">Next: Tech interview</span></td>
+                      </tr>
+                      <tr>
+                        <td>HanRiver Software</td>
+                        <td>Backend Engineer</td>
+                        <td>Seoul</td>
+                        <td>
+                          <span class="status-pill status-pill--offer"> Offer </span>
+                        </td>
+                        <td>2025-10-28</td>
+                        <td><span class="tag-small">Review contract details</span></td>
+                      </tr>
+                      <tr>
+                        <td>Busan Cloud Studio</td>
+                        <td>Fullstack Developer</td>
+                        <td>Busan</td>
+                        <td>
+                          <span class="status-pill status-pill--pending"> Pending </span>
+                        </td>
+                        <td>2025-11-12</td>
+                        <td><span class="tag-small">Waiting for response</span></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </article>
+            </div>
+
+            <!-- Colonne droite : Checklist + Expat card -->
+            <div class="column">
+              <!-- Checklist -->
+              <aside class="panel">
+                <div class="panel-header">
+                  <div class="panel-title">
+                    <div class="panel-title-main">
+                      <span class="icon">✅</span>
+                      <span>Relocation checklist</span>
+                    </div>
+                    <div class="panel-subtitle">Auto-generated from your AI strategy.</div>
+                  </div>
+                  <span class="badge-soft">10 / 24 done</span>
+                </div>
+
+                <div class="tasks-list">
+                  <div class="task-item">
+                    <div class="task-top">
+                      <div class="task-title">
+                        <input type="checkbox" checked />
+                        <span class="text">Update English CV & portfolio</span>
+                      </div>
+                      <span class="task-pill">Job search</span>
+                    </div>
+                    <div class="task-meta">
+                      <span><span class="dot"></span>Completed</span>
+                      <span>Deadline: This week</span>
+                    </div>
+                  </div>
+
+                  <div class="task-item">
+                    <div class="task-top">
+                      <div class="task-title">
+                        <input type="checkbox" />
+                        <span class="text">Request French criminal record</span>
+                      </div>
+                      <span class="task-pill">Documents</span>
+                    </div>
+                    <div class="task-meta">
+                      <span><span class="dot"></span>In progress</span>
+                      <span>Deadline: +10 days</span>
+                    </div>
+                  </div>
+
+                  <div class="task-item">
+                    <div class="task-top">
+                      <div class="task-title">
+                        <input type="checkbox" />
+                        <span class="text">Shortlist 10 Korean companies</span>
+                      </div>
+                      <span class="task-pill">Strategy</span>
+                    </div>
+                    <div class="task-meta">
+                      <span><span class="dot"></span>Next</span>
+                      <span>Deadline: This month</span>
+                    </div>
+                  </div>
+
+                  <div class="task-item">
+                    <div class="task-top">
+                      <div class="task-title">
+                        <input type="checkbox" />
+                        <span class="text">Daily Korean study (30 min)</span>
+                      </div>
+                      <span class="task-pill">Korean</span>
+                    </div>
+                    <div class="task-meta">
+                      <span><span class="dot"></span>Ongoing</span>
+                      <span>Streak: 14 days</span>
+                    </div>
+                  </div>
+                </div>
+              </aside>
+
+              <!-- Expat card -->
+              <aside class="panel">
+                <div class="panel-header">
+                  <div class="panel-title">
+                    <div class="panel-title-main">
+                      <span class="icon">🪪</span>
+                      <span>Expat Card · Preview</span>
+                    </div>
+                    <div class="panel-subtitle">Unlocks once your E-7 offer and core tasks are done.</div>
+                  </div>
+                </div>
+
+                <div class="expat-card">
+                  <div class="expat-header">
+                    <span class="title">Laurent · KR-Move profile</span>
+                    <span class="badge">Locked · 58% to go</span>
+                  </div>
+                  <div class="expat-body">
+                    <div>
+                      <div class="expat-label">Pseudo</div>
+                      <div class="expat-value">Laurent</div>
+                    </div>
+                    <div>
+                      <div class="expat-label">Target position</div>
+                      <div class="expat-value">Fullstack Developer</div>
+                    </div>
+                    <div>
+                      <div class="expat-label">Target city</div>
+                      <div class="expat-value">Seoul</div>
+                    </div>
+                    <div>
+                      <div class="expat-label">Estimated move</div>
+                      <div class="expat-value">Q1 2027</div>
+                    </div>
+                  </div>
+                  <div class="expat-footer">
+                    <span class="emoji">🎉</span>
+                    <span>
+                      Your Expat Card becomes active when your E-7 job offer is signed and all critical relocation tasks
+                      are marked as done.
+                    </span>
+                  </div>
+                </div>
+              </aside>
+            </div>
+          </section>
+        </div>
+      </main>
+
+      <footer class="app-footer">
+        KR-Move Planner · Yellow “Sunny Seoul” mock for design exploration · Built by Laurent Gourouvin
+      </footer>
+    </div>
+  </body>
+</html>
