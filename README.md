@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🇰🇷 KR-Move Planner  
+# KR-Move Planner  
 
 ### _Your Personal Relocation & Visa Dashboard for South Korea_  
 
