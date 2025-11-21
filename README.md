@@ -341,10 +341,10 @@ See: `LICENSE`.
 
 ## 🧑‍💻 Author
 
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?style=flat&logo=linkedin)](https://www.linkedin.com/in/laurentgourouvin)  
 **Laurent Gourouvin**  
-Fullstack JavaScript & PHP Developer  
-Preparing for South Korea 🇰🇷 (E-7 Visa Track)  
-[LinkedIn](https://www.linkedin.com/in/laurentgourouvin)
+Fullstack JavaScript & PHP Developer 2025  
+KR-Move Planner 
 
 ---
 
