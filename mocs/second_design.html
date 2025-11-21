@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>KR-Move Planner – Journey Board</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #020617;
+      --bg-soft: #020617;
+      --bg-surface: rgba(15, 23, 42, 0.92);
+
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.16);
+      --accent-strong: #0ea5e9;
+
+      --accent-alt: #f97316;
+      --accent-alt-soft: rgba(249, 115, 22, 0.18);
+
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --text-soft: #6b7280;
+
+      --border-subtle: rgba(30, 64, 175, 0.6);
+
+      --radius-lg: 18px;
+      --radius-pill: 999px;
+
+      --shadow-soft: 0 24px 60px rgba(15, 23, 42, 0.85);
+      --font-main: system-ui, -apple-system, BlinkMacSystemFont,
+        "SF Pro Text", "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-main);
+      background:
+        radial-gradient(circle at top, #1e293b 0, #020617 48%, #020617 100%);
+      color: var(--text-main);
+    }
+
+    .app {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* HEADER */
+
+    .app-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid rgba(15, 23, 42, 0.9);
+      background:
+        linear-gradient(
+          to bottom,
+          rgba(15, 23, 42, 0.96),
+          rgba(15, 23, 42, 0.9)
+        );
+      backdrop-filter: blur(20px);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    .header-inner {
+      max-width: 1180px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 14px;
+      background:
+        conic-gradient(from 220deg,
+          #38bdf8,
+          #a855f7,
+          #f97316,
+          #38bdf8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #0f172a;
+      box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.92);
+    }
+
+    .brand-text h1 {
+      margin: 0;
+      font-size: 1.1rem;
+      letter-spacing: 0.03em;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .brand-text h1 span.flag {
+      font-size: 1.1rem;
+    }
+
+    .brand-text p {
+      margin: 0;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .header-pill {
+      font-size: 0.72rem;
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(56, 189, 248, 0.7);
+      background: rgba(15, 23, 42, 0.9);
+      color: #e0f2fe;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .user-chip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 8px;
+      border-radius: var(--radius-pill);
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(30, 64, 175, 0.9);
+    }
+
+    .user-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      text-align: right;
+    }
+
+    .user-info strong {
+      font-size: 0.85rem;
+    }
+
+    .user-info span {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .user-avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 20% 0, #facc15, #38bdf8 55%, #020617);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: white;
+      box-shadow:
+        0 0 0 1px rgba(15, 23, 42, 0.95),
+        0 10px 25px rgba(15, 23, 42, 0.9);
+    }
+
+    /* MAIN */
+
+    .app-main {
+      flex: 1;
+      padding: 18px 12px 26px;
+    }
+
+    .main-inner {
+      max-width: 1180px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* PHASE STRIP */
+
+    .phase-strip {
+      border-radius: 20px;
+      padding: 10px 12px;
+      background:
+        radial-gradient(circle at top left,
+          rgba(30, 64, 175, 0.6),
+          rgba(15, 23, 42, 0.96));
+      border: 1px solid rgba(30, 64, 175, 0.9);
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .phase-strip-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 0.8rem;
+    }
+
+    .phase-strip-top-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .phase-label {
+      padding: 3px 8px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      background: rgba(15, 23, 42, 0.85);
+      color: var(--text-muted);
+      font-size: 0.72rem;
+    }
+
+    .phase-title {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .phase-title strong {
+      font-size: 0.9rem;
+    }
+
+    .phase-title span {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .phase-strip-top-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .phase-progress-text {
+      font-size: 0.78rem;
+      color: #e0f2fe;
+    }
+
+    .pill-soft {
+      font-size: 0.72rem;
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(56, 189, 248, 0.7);
+      background: var(--accent-soft);
+      color: var(--accent-strong);
+      white-space: nowrap;
+    }
+
+    .phase-strip-progress {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .phase-progress-bar {
+      flex: 1;
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.92);
+      overflow: hidden;
+      border: 1px solid rgba(30, 64, 175, 0.9);
+    }
+
+    .phase-progress-fill {
+      width: 42%;
+      height: 100%;
+      border-radius: 999px;
+      background:
+        linear-gradient(90deg, #38bdf8, #0ea5e9, #a855f7);
+      box-shadow: 0 0 16px rgba(56, 189, 248, 0.8);
+    }
+
+    /* BOARD LAYOUT */
+
+    .board {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.4fr) minmax(280px, 1.1fr);
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    @media (max-width: 1040px) {
+      .board {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    /* PANELS */
+
+    .panel {
+      background:
+        radial-gradient(circle at top left,
+          rgba(15, 23, 42, 0.96),
+          rgba(15, 23, 42, 0.98));
+      border-radius: var(--radius-lg);
+      padding: 14px 14px 16px;
+      border: 1px solid rgba(31, 41, 55, 0.95);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .panel-title {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .panel-title-main {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    .panel-title-main span.icon {
+      font-size: 1rem;
+    }
+
+    .panel-subtitle {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .badge-soft {
+      font-size: 0.72rem;
+      padding: 4px 8px;
+      border-radius: var(--radius-pill);
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--accent-strong);
+      border: 1px solid rgba(56, 189, 248, 0.7);
+      white-space: nowrap;
+    }
+
+    /* TODAY FOCUS COLUMN */
+
+    .chip-inline {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 8px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(55, 65, 81, 0.95);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      background: rgba(15, 23, 42, 0.96);
+    }
+
+    .focus-list {
+      margin-top: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 0.8rem;
+    }
+
+    .focus-item {
+      border-radius: 12px;
+      padding: 8px 9px;
+      background:
+        radial-gradient(circle at top left,
+          rgba(15, 23, 42, 0.98),
+          rgba(15, 23, 42, 1));
+      border: 1px solid rgba(31, 41, 55, 0.95);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .focus-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .focus-title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .focus-title input {
+      margin: 0;
+      accent-color: var(--accent);
+    }
+
+    .focus-title span.text {
+      font-weight: 500;
+    }
+
+    .focus-pill {
+      font-size: 0.7rem;
+      padding: 3px 7px;
+      border-radius: var(--radius-pill);
+      background: var(--accent-soft);
+      color: var(--accent-strong);
+      border: 1px solid rgba(56, 189, 248, 0.7);
+      white-space: nowrap;
+    }
+
+    .focus-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    .focus-meta span.dot {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #22c55e;
+      margin-right: 4px;
+    }
+
+    /* STRATEGY TIMELINE */
+
+    .timeline {
+      margin-top: 4px;
+      position: relative;
+      padding-left: 14px;
+      font-size: 0.83rem;
+    }
+
+    .timeline::before {
+      content: "";
+      position: absolute;
+      left: 6px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: linear-gradient(to bottom,
+        rgba(56, 189, 248, 0.8),
+        rgba(129, 140, 248, 0.5),
+        rgba(15, 23, 42, 0.2));
+      opacity: 0.9;
+    }
+
+    .timeline-step {
+      position: relative;
+      padding-left: 10px;
+      padding-bottom: 10px;
+    }
+
+    .timeline-step:last-child {
+      padding-bottom: 0;
+    }
+
+    .timeline-bullet {
+      position: absolute;
+      left: -2px;
+      top: 4px;
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 0, #facc15, #38bdf8);
+      box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.95);
+    }
+
+    .timeline-headline {
+      font-size: 0.86rem;
+      margin-bottom: 2px;
+      font-weight: 500;
+    }
+
+    .timeline-body {
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .timeline-body ul {
+      margin: 6px 0 0;
+      padding-left: 16px;
+    }
+
+    .timeline-tags {
+      margin-top: 6px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .tag {
+      font-size: 0.7rem;
+      padding: 3px 7px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.96);
+      color: var(--text-muted);
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      white-space: nowrap;
+    }
+
+    /* RIGHT COLUMN: JOBS + EXPAT */
+
+    .stack {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .table-wrapper {
+      margin-top: 4px;
+      border-radius: 12px;
+      border: 1px solid rgba(31, 41, 55, 0.95);
+      overflow: hidden;
+      background: rgba(15, 23, 42, 0.98);
+      font-size: 0.78rem;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .table th,
+    .table td {
+      padding: 7px 8px;
+      text-align: left;
+      border-bottom: 1px solid rgba(31, 41, 55, 0.95);
+    }
+
+    .table th {
+      font-weight: 500;
+      color: var(--text-muted);
+      font-size: 0.72rem;
+      background: rgba(15, 23, 42, 0.98);
+    }
+
+    .status-pill {
+      font-size: 0.7rem;
+      padding: 2px 7px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      color: var(--text-muted);
+      background: rgba(15, 23, 42, 0.96);
+    }
+
+    .status-pill--interview {
+      border-color: rgba(56, 189, 248, 0.8);
+      color: #38bdf8;
+      background: rgba(8, 47, 73, 0.8);
+    }
+
+    .status-pill--offer {
+      border-color: rgba(34, 197, 94, 0.8);
+      color: #4ade80;
+      background: rgba(5, 46, 22, 0.8);
+    }
+
+    .status-pill--pending {
+      border-color: rgba(234, 179, 8, 0.8);
+      color: #facc15;
+      background: rgba(69, 26, 3, 0.85);
+    }
+
+    .tag-small {
+      font-size: 0.7rem;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.96);
+      color: var(--text-muted);
+      border: 1px solid rgba(31, 41, 55, 0.95);
+      white-space: nowrap;
+    }
+
+    .expat-card {
+      border-radius: 14px;
+      padding: 10px 10px;
+      background:
+        radial-gradient(circle at top left,
+          rgba(56, 189, 248, 0.3),
+          rgba(15, 23, 42, 0.98));
+      border: 1px solid rgba(56, 189, 248, 0.75);
+      font-size: 0.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .expat-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .expat-header span.title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+    }
+
+    .expat-header span.badge {
+      font-size: 0.7rem;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: var(--accent-alt-soft);
+      color: var(--accent-alt);
+      border: 1px solid rgba(249, 115, 22, 0.8);
+      white-space: nowrap;
+    }
+
+    .expat-body {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px 10px;
+    }
+
+    .expat-label {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    .expat-value {
+      font-size: 0.82rem;
+      font-weight: 500;
+    }
+
+    .expat-footer {
+      margin-top: 2px;
+      font-size: 0.75rem;
+      color: #e0f2fe;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .expat-footer span.emoji {
+      font-size: 1rem;
+    }
+
+    /* FOOTER */
+
+    .app-footer {
+      padding: 8px 16px 20px;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="app-header">
+      <div class="header-inner">
+        <div class="brand">
+          <div class="brand-logo">KR</div>
+          <div class="brand-text">
+            <h1>
+              <span class="flag">🇰🇷</span> KR-Move Planner
+            </h1>
+            <p>Journey board for your E-7 relocation to South Korea</p>
+          </div>
+        </div>
+        <div class="header-right">
+          <span class="header-pill">
+            ● Personal board · Q1 2027 target
+          </span>
+          <div class="user-chip">
+            <div class="user-info">
+              <strong>Laurent</strong>
+              <span>E-7 Track · Fullstack Dev</span>
+            </div>
+            <div class="user-avatar">LG</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="app-main">
+      <div class="main-inner">
+        <!-- Phase strip -->
+        <section class="phase-strip">
+          <div class="phase-strip-top">
+            <div class="phase-strip-top-left">
+              <span class="phase-label">Roadmap</span>
+              <div class="phase-title">
+                <strong>Phase 2 — Job & documents</strong>
+                <span>Tracking your current step from France to Seoul.</span>
+              </div>
+            </div>
+            <div class="phase-strip-top-right">
+              <span class="phase-progress-text">42% completed · 10 / 24 tasks</span>
+              <span class="pill-soft">Estimated move · Q1 2027</span>
+            </div>
+          </div>
+          <div class="phase-strip-progress">
+            <div class="phase-progress-bar">
+              <div class="phase-progress-fill"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Board layout -->
+        <section class="board">
+          <!-- Column 1: Today focus -->
+          <article class="panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <div class="panel-title-main">
+                  <span class="icon">📌</span>
+                  <span>Today focus</span>
+                </div>
+                <div class="panel-subtitle">
+                  3–4 concrete items that move your relocation forward today.
+                </div>
+              </div>
+              <span class="badge-soft">Daily slice</span>
+            </div>
+
+            <span class="chip-inline">
+              <span>✨</span> Focus on high-leverage tasks only.
+            </span>
+
+            <div class="focus-list">
+              <div class="focus-item">
+                <div class="focus-top">
+                  <div class="focus-title">
+                    <input type="checkbox" checked />
+                    <span class="text">Finalize English CV & portfolio</span>
+                  </div>
+                  <span class="focus-pill">Job search</span>
+                </div>
+                <div class="focus-meta">
+                  <span><span class="dot"></span>Completed</span>
+                  <span>Time block: 09:00–10:00</span>
+                </div>
+              </div>
+
+              <div class="focus-item">
+                <div class="focus-top">
+                  <div class="focus-title">
+                    <input type="checkbox" />
+                    <span class="text">Request French criminal record</span>
+                  </div>
+                  <span class="focus-pill">Documents</span>
+                </div>
+                <div class="focus-meta">
+                  <span><span class="dot"></span>In progress</span>
+                  <span>Deadline: +10 days</span>
+                </div>
+              </div>
+
+              <div class="focus-item">
+                <div class="focus-top">
+                  <div class="focus-title">
+                    <input type="checkbox" />
+                    <span class="text">Shortlist 10 Korean companies</span>
+                  </div>
+                  <span class="focus-pill">Strategy</span>
+                </div>
+                <div class="focus-meta">
+                  <span><span class="dot"></span>Next</span>
+                  <span>Deadline: This month</span>
+                </div>
+              </div>
+
+              <div class="focus-item">
+                <div class="focus-top">
+                  <div class="focus-title">
+                    <input type="checkbox" />
+                    <span class="text">Daily Korean study (30 min)</span>
+                  </div>
+                  <span class="focus-pill">Korean</span>
+                </div>
+                <div class="focus-meta">
+                  <span><span class="dot"></span>Ongoing</span>
+                  <span>Streak: 14 days</span>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- Column 2: Strategy timeline -->
+          <article class="panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <div class="panel-title-main">
+                  <span class="icon">🧠</span>
+                  <span>Relocation strategy timeline</span>
+                </div>
+                <div class="panel-subtitle">
+                  From eligibility to integration — your E-7 journey in 4 blocks.
+                </div>
+              </div>
+              <span class="badge-soft">AI generated</span>
+            </div>
+
+            <div class="timeline">
+              <div class="timeline-step">
+                <div class="timeline-bullet"></div>
+                <div class="timeline-headline">
+                  1. Profile & eligibility check
+                </div>
+                <div class="timeline-body">
+                  With 5+ years as a Fullstack Developer and a relevant degree, your
+                  profile is aligned with the E-7 IT category. Focus on companies
+                  already familiar with foreign hires where English is accepted.
+                  <div class="timeline-tags">
+                    <span class="tag">E-7 IT category</span>
+                    <span class="tag">5+ years experience</span>
+                    <span class="tag">Bachelor level</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="timeline-step">
+                <div class="timeline-bullet"></div>
+                <div class="timeline-headline">
+                  2. Core documents (France → Korea)
+                </div>
+                <div class="timeline-body">
+                  Start early with every document that needs translation or
+                  apostille. Everything must match the job title in your future contract.
+                  <ul>
+                    <li>Diploma + transcripts · translated</li>
+                    <li>Work certificates (last 3–5 years)</li>
+                    <li>Criminal record, recent (&lt; 3 months)</li>
+                    <li>Valid passport + biometric photos</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="timeline-step">
+                <div class="timeline-bullet"></div>
+                <div class="timeline-headline">
+                  3. Job search & positioning
+                </div>
+                <div class="timeline-body">
+                  Target mid-level roles where your stack (React, Node, Symfony)
+                  clearly solves business problems. Use LinkedIn, JobKorea, Saramin
+                  and referrals. Each application: one status, one next step.
+                </div>
+              </div>
+
+              <div class="timeline-step">
+                <div class="timeline-bullet"></div>
+                <div class="timeline-headline">
+                  4. Korean & integration plan
+                </div>
+                <div class="timeline-body">
+                  Keep Korean learning in parallel: aim for TOPIK II as a first
+                  threshold, then progressively move toward TOPIK 4 to unlock more
+                  roles and smoother daily life once in Seoul.
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- Column 3: Job apps + Expat card -->
+          <aside class="stack">
+            <section class="panel">
+              <div class="panel-header">
+                <div class="panel-title">
+                  <div class="panel-title-main">
+                    <span class="icon">💼</span>
+                    <span>Job applications</span>
+                  </div>
+                  <div class="panel-subtitle">
+                    Keep E-7-relevant roles in one compact view.
+                  </div>
+                </div>
+                <span class="badge-soft">3 active · 1 offer</span>
+              </div>
+
+              <div class="table-wrapper">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Company</th>
+                      <th>Role</th>
+                      <th>Status</th>
+                      <th>Applied</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>SeoulTech Labs</td>
+                      <td>Fullstack Developer</td>
+                      <td>
+                        <span class="status-pill status-pill--interview">
+                          Interview
+                        </span>
+                      </td>
+                      <td>2025-11-05</td>
+                    </tr>
+                    <tr>
+                      <td>HanRiver Software</td>
+                      <td>Backend Engineer</td>
+                      <td>
+                        <span class="status-pill status-pill--offer">
+                          Offer
+                        </span>
+                      </td>
+                      <td>2025-10-28</td>
+                    </tr>
+                    <tr>
+                      <td>Busan Cloud Studio</td>
+                      <td>Fullstack Developer</td>
+                      <td>
+                        <span class="status-pill status-pill--pending">
+                          Pending
+                        </span>
+                      </td>
+                      <td>2025-11-12</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-header">
+                <div class="panel-title">
+                  <div class="panel-title-main">
+                    <span class="icon">🪪</span>
+                    <span>Expat Card preview</span>
+                  </div>
+                  <div class="panel-subtitle">
+                    Snapshot of your future KR-Move identity.
+                  </div>
+                </div>
+              </div>
+
+              <div class="expat-card">
+                <div class="expat-header">
+                  <span class="title">Laurent · KR-Move profile</span>
+                  <span class="badge">Locked · 58% to go</span>
+                </div>
+                <div class="expat-body">
+                  <div>
+                    <div class="expat-label">Pseudo</div>
+                    <div class="expat-value">Laurent</div>
+                  </div>
+                  <div>
+                    <div class="expat-label">Target position</div>
+                    <div class="expat-value">Fullstack Developer</div>
+                  </div>
+                  <div>
+                    <div class="expat-label">Target city</div>
+                    <div class="expat-value">Seoul</div>
+                  </div>
+                  <div>
+                    <div class="expat-label">Estimated move</div>
+                    <div class="expat-value">Q1 2027</div>
+                  </div>
+                </div>
+                <div class="expat-footer">
+                  <span class="emoji">🎉</span>
+                  <span>Your Expat Card unlocks once your E-7 offer is signed and the last
+                    relocation tasks are marked as done.</span>
+                </div>
+              </div>
+            </section>
+          </aside>
+        </section>
+      </div>
+    </main>
+
+    <footer class="app-footer">
+      KR-Move Planner · Journey board mock for layout exploration · Built by Laurent Gourouvin
+    </footer>
+  </div>
+</body>
+</html>
