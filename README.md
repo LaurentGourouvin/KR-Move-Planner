@@ -355,6 +355,3 @@ KR-Move Planner
 - **TypeScript** – Fullstack type-safety  
 - **PostgreSQL** – Relational database  
 - **Docker** – Dev environment & services orchestration  
-
----
-
