@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
     "target": "ESNext",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": false,
@@ -19,7 +20,10 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["app/*"],
+      "@components/*": ["app/components/*"],
+      "@pages/*": ["app/pages/*"],
+      "@services/*": ["app/services/*"]
     }
   },
   "include": [
