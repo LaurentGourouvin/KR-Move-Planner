@@ -5,6 +5,15 @@ import nextTs from "eslint-config-next/typescript";
 export default defineConfig([
   ...nextVitals,
   ...nextTs,
+  {
+    settings: {
+      "import/resolver": {
+        typescript: {
+          project: "./tsconfig.json"
+        }
+      }
+    }
+  },
   globalIgnores([
     // Default ignores of eslint-config-next:
     "node_modules/**",
