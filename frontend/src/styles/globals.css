@@ -5,6 +5,7 @@
   --color-medium-blue: #457b9d;
   --color-dark-blue: #1d3557;
   --color-danger: #e63946;
+  --color-success: #2a9d8f;
   --color-background: #f1faee;
 }
 
@@ -24,13 +25,9 @@
   box-sizing: border-box;
 }
 
-html {
-  font-size: 62.5%; /* 1rem = 10px */
-}
-
 body {
   min-height: 100vh;
-  font-family: system-ui, sans-serif;
+  font-family: "Inter", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
